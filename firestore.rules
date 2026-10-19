@@ -1,0 +1,24 @@
+rules_version = '2';
+// Phillips CRM security rules.
+// Only the Google accounts listed below can read or write anything.
+// The Apps Script engine uses a service account, which bypasses these rules.
+// After editing: Firebase console > Firestore Database > Rules > paste > Publish.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isTeam() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower() in [
+          'jaleel@legacytax.us',   // replace with the real sign-in addresses
+          'todd@legacytax.us',
+          'jackson@legacytax.us',
+          'sam@legacytax.us'
+        ];
+    }
+
+    match /{document=**} {
+      allow read, write: if isTeam();
+    }
+  }
+}
